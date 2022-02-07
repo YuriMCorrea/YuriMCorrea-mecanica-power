@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -122,6 +123,7 @@ public class TopicoController {
 // -------- POST TOPICO -----------
 	@PostMapping
 	@Transactional
+	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<TopicoDTO> cadastrarTopico(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.converterFormToObj(cursoRepository);
 		topicoRepository.save(topico);
@@ -132,6 +134,7 @@ public class TopicoController {
 // -------- PUT TOPICO -----------
 	@PutMapping("editar/{id}")
 	@Transactional
+	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<TopicoDTO> atualizar(@PathVariable("id") Long id, @RequestBody @Valid TopicoEditarForm form){
 		Optional<Topico> topico = topicoRepository.findById(id);
 		if(topico.isPresent()) {
@@ -142,9 +145,11 @@ public class TopicoController {
 // -------- DELETAR TOPICO -----------
 	@DeleteMapping("deletar/{id}")
 	@Transactional
+	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<?> deletar(@PathVariable("id") Long id){
 		Optional<Topico> topico = topicoRepository.findById(id);
 		if(topico.isPresent()) {
+			topicoRepository.delete(topico.get());
 			return ResponseEntity.ok().build();
 		}
 		return ResponseEntity.notFound().build();

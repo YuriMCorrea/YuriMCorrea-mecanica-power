@@ -9,16 +9,26 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.mecanicapower.ecommerce.service.TokenService;
+
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
+	
+	private TokenService tokenService;
+	
+// -- CONSTRUTOR PARA INJETAR O TOKEN SERVICE 
+	public AutenticacaoViaTokenFilter(TokenService tokenService) {
+		super();
+		this.tokenService = tokenService;
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
 		String token = recuperarToken(request);
-		System.out.println(token);
-		
+		boolean valido = tokenService.isTokenValid(token);
+		System.out.println(valido);
 		filterChain.doFilter(request, response);
 		
 	}

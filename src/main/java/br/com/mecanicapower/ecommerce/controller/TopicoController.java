@@ -52,6 +52,7 @@ public class TopicoController {
 	 */
 // -------- GET TODOS OS TOPICOS PAGINADO -----------
 	@GetMapping()
+	//- Boas práticas do cache pedem que seja utilizado naquelas tabelas que raramente sao atualizadas, evitando as tabelas que são atualizadas constantemente.
 	@Cacheable(value = "ListaTodosTopicos")
 	public Page<TopicoDTO> lista(@PageableDefault(sort = "id", direction = Direction.DESC, page = 0, size = 10) 
 			Pageable paginacao){
@@ -123,6 +124,7 @@ public class TopicoController {
 // -------- POST TOPICO -----------
 	@PostMapping
 	@Transactional
+	//- Boas práticas do cache pedem que seja utilizado naquelas tabelas que raramente sao atualizadas, evitando as tabelas que são atualizadas constantemente.
 	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<TopicoDTO> cadastrarTopico(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.converterFormToObj(cursoRepository);
@@ -134,6 +136,7 @@ public class TopicoController {
 // -------- PUT TOPICO -----------
 	@PutMapping("editar/{id}")
 	@Transactional
+	//- Boas práticas do cache pedem que seja utilizado naquelas tabelas que raramente sao atualizadas, evitando as tabelas que são atualizadas constantemente.
 	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<TopicoDTO> atualizar(@PathVariable("id") Long id, @RequestBody @Valid TopicoEditarForm form){
 		Optional<Topico> topico = topicoRepository.findById(id);
@@ -145,6 +148,7 @@ public class TopicoController {
 // -------- DELETAR TOPICO -----------
 	@DeleteMapping("deletar/{id}")
 	@Transactional
+	//- Boas práticas do cache pedem que seja utilizado naquelas tabelas que raramente sao atualizadas, evitando as tabelas que são atualizadas constantemente.
 	@CacheEvict(value = "ListaTodosTopicos", allEntries = true)
 	public ResponseEntity<?> deletar(@PathVariable("id") Long id){
 		Optional<Topico> topico = topicoRepository.findById(id);

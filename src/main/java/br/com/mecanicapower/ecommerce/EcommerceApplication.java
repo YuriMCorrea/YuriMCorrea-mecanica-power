@@ -6,7 +6,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @SpringBootApplication
+//- Permite o uso direto da interface Pageable e @PageableDefault
 @EnableSpringDataWebSupport
+//- Permite o uso de cache
 @EnableCaching
 public class EcommerceApplication {
 

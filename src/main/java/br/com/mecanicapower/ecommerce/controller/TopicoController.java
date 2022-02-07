@@ -8,8 +8,9 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,19 +40,39 @@ public class TopicoController {
 	@Autowired
 	private CursoRepository cursoRepository;
 
-// -------- GET TODOS OS TOPICOS PAGINADO -----------
 //	Outra forma de fazer: @RequestMapping(value = "/topicos", method = RequestMethod.GET) 
+	/*
+	 * @GetMapping() public Page<TopicoDTO> lista(@RequestParam int
+	 * pagina, @RequestParam int qtd, @RequestParam String ordenacao){ Pageable
+	 * paginacao = PageRequest.of(pagina, qtd, Direction.ASC, ordenacao);
+	 * Page<Topico> topicos = topicoRepository.findAll(paginacao); return
+	 * TopicoDTO.converterObjToDTO(topicos); }
+	 */
+// -------- GET TODOS OS TOPICOS PAGINADO -----------
 	@GetMapping()
-	public Page<TopicoDTO> lista(@RequestParam int pagina, @RequestParam int qtd){ 
-		Pageable paginacao = PageRequest.of(pagina, qtd);
+	public Page<TopicoDTO> lista(@PageableDefault(sort = "id", direction = Direction.DESC, page = 0, size = 10) 
+			Pageable paginacao){
+		
 		Page<Topico> topicos = topicoRepository.findAll(paginacao); 
 		return TopicoDTO.converterObjToDTO(topicos); 
 	}
 	
+	/*
+	 * @GetMapping("/curso") public Page<TopicoDTO>
+	 * listaPorCursoPaginada(@RequestParam(required = false) String
+	 * nomeCurso, @RequestParam int pagina, @RequestParam int qtd) { Pageable
+	 * paginacao = PageRequest.of(pagina, qtd);
+	 * 
+	 * if (nomeCurso == null) { Page<Topico> topicos =
+	 * topicoRepository.findAll(paginacao); return
+	 * TopicoDTO.converterObjToDTO(topicos); } else { Page<Topico> topicosFiltrados
+	 * = topicoRepository.findByCurso_Nome(nomeCurso, paginacao); return
+	 * TopicoDTO.converterObjToDTO(topicosFiltrados); } }
+	 */
 // -------- GET TOPICOS POR CURSO PAGINADO -----------	
 	@GetMapping("/curso")
-	public Page<TopicoDTO> listaPorCursoPaginada(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina, @RequestParam int qtd) {
-		Pageable paginacao = PageRequest.of(pagina, qtd);
+	public Page<TopicoDTO> listaPorCursoPaginada(@RequestParam(required = false) String nomeCurso, 
+			@PageableDefault(sort = "titulo", direction = Direction.ASC, page = 0, size = 10) Pageable paginacao) {
 		
 		if (nomeCurso == null) {
 			Page<Topico> topicos = topicoRepository.findAll(paginacao);
@@ -64,8 +85,8 @@ public class TopicoController {
 	
 // -------- GET TOPICOS POR CATEGORIA PAGINADO -----------	
 	@GetMapping("/categoria")
-	public Page<TopicoDTO> listaPorCategoria(@RequestParam(required = false) String nomeCategoria, @RequestParam int pagina, @RequestParam int qtd) {
-		Pageable paginacao = PageRequest.of(pagina, qtd);
+	public Page<TopicoDTO> listaPorCategoria(@RequestParam(required = false) String nomeCategoria, 
+			@PageableDefault(sort = "titulo", direction = Direction.ASC, page = 0, size = 10) Pageable paginacao) {
 		
 		if (nomeCategoria == null) {
 			Page<Topico> topicos = topicoRepository.findAll(paginacao);

@@ -7,18 +7,24 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.mecanicapower.ecommerce.entity.Usuario;
+import br.com.mecanicapower.ecommerce.repositories.UsuarioRepository;
 import br.com.mecanicapower.ecommerce.service.TokenService;
 
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 	
 	private TokenService tokenService;
+	private UsuarioRepository usuarioRepository;
+	
 	
 // -- CONSTRUTOR PARA INJETAR O TOKEN SERVICE 
-	public AutenticacaoViaTokenFilter(TokenService tokenService) {
-		super();
+	public AutenticacaoViaTokenFilter(TokenService tokenService, UsuarioRepository usuarioRepository) {
+		this.usuarioRepository = usuarioRepository;
 		this.tokenService = tokenService;
 	}
 
@@ -28,9 +34,19 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 		
 		String token = recuperarToken(request);
 		boolean valido = tokenService.isTokenValid(token);
-		System.out.println(valido);
+		if(valido) {
+			autenticarCliente(token);
+		}
+
 		filterChain.doFilter(request, response);
 		
+	}
+
+	private void autenticarCliente(String token) {
+		Long idUsuario = tokenService.getIdUsuario(token);
+		Usuario usuario = usuarioRepository.findById(idUsuario).get();
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
 	private String recuperarToken(HttpServletRequest request) {
